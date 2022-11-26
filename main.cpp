@@ -39,23 +39,19 @@ int main()
 			else if (event.type == sf::Event::KeyPressed)
 			{	
 				// Rotation
-				if (event.key.code == sf::Keyboard::Right)
-				{
-					affine = glm::rotate(affine, 0.1f, glm::vec3(0.0f, 1.0f, 0.0f));
-				}
-				else if (event.key.code == sf::Keyboard::Left)
-				{
-					affine = glm::rotate(affine, -0.1f, glm::vec3(0.0f, 1.0f, 0.0f));
-				}
-				else if (event.key.code == sf::Keyboard::Up)
+				if (event.key.code == sf::Keyboard::P)
 				{
 					affine = glm::rotate(affine, 0.1f, glm::vec3(1.0f, 0.0f, 0.0f));
 				}
-				else if (event.key.code == sf::Keyboard::Down)
+				else if (event.key.code == sf::Keyboard::R)
 				{
-					affine = glm::rotate(affine, -0.1f, glm::vec3(1.0f, 0.0f, 0.0f));
+					affine = glm::rotate(affine, 0.1f, glm::vec3(0.0f, 1.0f, 0.0f));
 				}
-				
+				else if (event.key.code == sf::Keyboard::Y)
+				{
+					affine = glm::rotate(affine, 0.1f, glm::vec3(0.0f, 0.0f, 1.0f));
+				}
+
 				// Movement
 				else if (event.key.code == sf::Keyboard::W)
 				{
@@ -137,25 +133,30 @@ EXIT_IS_RIGHT_HERE: // Метка выхода
 
 void InitVBO()
 {
-	glGenBuffers(1, &VBO); // Генерируем буфер
+	glGenBuffers(1, &VBO); // Генерируем вершинный буфер
 	Vertex data[] = {
-		// Cube
-		{-1.0f, -1.0f, -1.0f, red}, {-1.0f, -1.0f, 1.0f, red}, {-1.0f, 1.0f, 1.0f, red},
-		{1.0f, 1.0f, -1.0f, red}, {-1.0f, -1.0f,-1.0f, red}, {-1.0f, 1.0f, -1.0f, red},
-		{1.0f, -1.0f, 1.0f, red}, {-1.0f, -1.0f, -1.0f, red}, {1.0f, -1.0f, -1.0f, red},
-		{1.0f, 1.0f, -1.0f, red}, {1.0f,-1.0f,-1.0f, red}, {-1.0f, -1.0f, -1.0f, red},
-		{-1.0f, -1.0f, -1.0f, red}, {-1.0f, 1.0f, 1.0f, red}, {-1.0f, 1.0f,-1.0f, red},
-		{1.0f, -1.0f, 1.0f, red}, {-1.0f, -1.0f, 1.0f, red}, {-1.0f, -1.0f, -1.0f, red},
-		{-1.0f, 1.0f, 1.0f, red}, {-1.0f, -1.0f, 1.0f, red},{1.0f, -1.0f, 1.0f, red},
-		{1.0f, 1.0f, 1.0f, red}, {1.0f, -1.0f, -1.0f, red}, {1.0f, 1.0f,-1.0f, red},
-		{1.0f, -1.0f, -1.0f, red}, {1.0f, 1.0f, 1.0f, red}, {1.0f, -1.0f, 1.0f, red},
-		{1.0f, 1.0f, 1.0f, red}, {1.0f, 1.0f, -1.0f, red}, {-1.0f, 1.0f, -1.0f, red},
-		{1.0f, 1.0f, 1.0f, red}, {-1.0f, 1.0f, -1.0f, red}, {-1.0f, 1.0f, 1.0f, red},
-		{1.0f, 1.0f, 1.0f, red}, {-1.0f, 1.0f, 1.0f, red}, {1.0f, -1.0f, 1.0f, red}
+		/*
+		//Cube
+		{1.0f, 1.0f, 1.0f, red},	//0
+		{1.0f, 1.0f, -1.0f, blue},	//1
+		{1.0f, -1.0f, 1.0f, green},	//2
+		{1.0f, -1.0f, -1.0f, red},	//3
+		{-1.0f, 1.0f, 1.0f, blue},	//4
+		{-1.0f, 1.0f, -1.0f, green},//5
+		{-1.0f, -1.0f, 1.0f, red},	//6
+		{-1.0f, -1.0f, -1.0f, blue}	//7*/
+
+		//Cube
+		{1.0f, 1.0f, -1.0f, red},{-1.0f, 1.0f, -1.0f,blue},{-1.0f, 1.0f, 1.0f, green},{1.0f, 1.0f, 1.0f, orange}, //top face
+		{1.0f, -1.0f, 1.0f, yellow},{-1.0f, -1.0f, 1.0f, violet}, {-1.0f, -1.0f, -1.0f, white},{1.0f, -1.0f, -1.0f, cyan}, // bottom face
+		{1.0f, 1.0f, 1.0f, orange},{-1.0f, 1.0f, 1.0f, green},{-1.0f, -1.0f, 1.0f, violet},{1.0f, -1.0f, 1.0f, yellow}, // front face
+		{1.0f, -1.0f, -1.0f, cyan},{-1.0f, -1.0f, -1.0f, white},{-1.0f, 1.0f, -1.0f, blue},{1.0f, 1.0f, -1.0f, red}, //back face
+		{-1.0f, 1.0f, 1.0f, green},{-1.0f, 1.0f, -1.0f, blue},{-1.0f, -1.0f, -1.0f, white},{-1.0f, -1.0f, 1.0f, violet}, //left face
+		{1.0f, 1.0f, -1.0f, red},{1.0f, 1.0f, 1.0f, orange},{1.0f, -1.0f, 1.0f, yellow},{1.0f, -1.0f, -1.0f, cyan}, //right face
+
 	};
-	glBindBuffer(GL_ARRAY_BUFFER, VBO); // Привязываем буфер
-	// Загружаем данные в буфер
-	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO); // Привязываем вершинный буфер
+	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW); // Загружаем данные в буфер
 	checkOpenGLerror();
 }
 
@@ -245,7 +246,7 @@ void Draw(sf::Window& window)
 	glBindBuffer(GL_ARRAY_BUFFER, 0); // Отвязываем буфер
 	
 	window.setTitle("Cube");
-	glDrawArrays(GL_TRIANGLES, 0, 36); //Рисуем
+	glDrawArrays(GL_QUADS, 0, 24); //Рисуем
 
 	glDisableVertexAttribArray(Attrib_vertex); // Отключаем атрибут
 	glDisableVertexAttribArray(Attrib_color);
