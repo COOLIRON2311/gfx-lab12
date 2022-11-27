@@ -64,6 +64,12 @@ void ReleaseVBO();
 // Функция для очистки ресурсов
 void Release();
 
+enum class ShapeType {
+	Gradient_Tetrahedron = 0,
+	Gradient_Texture_Cube,
+	Double_Texture_Cube,
+	Gradient_Pie
+};
 
 #define red    1.0, 0.0, 0.0, 1.0
 #define green  0.0, 1.0, 0.0, 1.0
