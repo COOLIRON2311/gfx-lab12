@@ -15,8 +15,12 @@ GLuint Program;
 // ID атрибута
 GLint Attrib_vertex;
 GLint Attrib_color;
+GLint Attrib_tex_coord;
 GLint Uniform_proj;
 GLint Uniform_affine;
+GLint Uniform_texture1;
+GLint Uniform_texture2;
+GLint Uniform_mix_value;
 // ID вершинного буфера
 GLuint VBO;
 
@@ -25,8 +29,7 @@ glm::mat4 affine;
 // Матрица проекции
 glm::mat4 proj;
 
-GLfloat tex1_ratio = 0.5f;
-GLfloat tex2_ratio = 0.5f;
+GLfloat tex_ratio = 0.5f;
 
 // Структура для хранения вершин
 struct Vertex
@@ -41,6 +44,10 @@ struct Vertex
 	GLfloat g;
 	GLfloat b;
 	GLfloat a;
+
+	// texture coords
+	GLfloat s;
+	GLfloat t;
 };
 
 // Функция для установки иконки приложения

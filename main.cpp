@@ -2,7 +2,6 @@
 #include "shaders.h"
 
 ShapeType shapetype = ShapeType::Gradient_Tetrahedron;
-//ShapeType shapetype = ShapeType::Gradient_Texture_Cube;
 
 void Init()
 {
@@ -106,22 +105,22 @@ int main()
 
 				else if (event.key.code == sf::Keyboard::Num1)
 				{
-					/*TODO*/
+					shapetype = ShapeType::Gradient_Tetrahedron;
 				}
 				
 				else if (event.key.code == sf::Keyboard::Num2)
 				{
-					/*TODO*/
+					shapetype = ShapeType::Gradient_Texture_Cube;
 				}
 
 				else if (event.key.code == sf::Keyboard::Num3)
 				{
-					/*TODO*/
+					shapetype = ShapeType::Double_Texture_Cube;
 				}
 
 				else if (event.key.code == sf::Keyboard::Num4)
 				{
-					/*TODO*/
+					shapetype = ShapeType::Gradient_Pie;
 				}
 			}
 		}
@@ -137,6 +136,14 @@ EXIT_IS_RIGHT_HERE: // Метка выхода
 void InitVBO()
 {
 	glGenBuffers(1, &VBO); // Генерируем вершинный буфер
+	Vertex cp1 = { 1.0f, 1.0f, 1.0f, red };
+	Vertex cp2 = { 1.0f, 1.0f, -1.0f, green };
+	Vertex cp3 = { 1.0f, -1.0f, 1.0f, blue };
+	Vertex cp4 = { 1.0f, -1.0f, -1.0f, cyan };
+	Vertex cp5 = { -1.0f, 1.0f, 1.0f, yellow };
+	Vertex cp6 = {-1.0f, 1.0f, -1.0f, orange};
+	Vertex cp7 = {-1.0f, -1.0f, 1.0f, white};
+	Vertex cp8 = {-1.0f, -1.0f, -1.0f, violet};
 	Vertex data[] = {
 		/*
 		//Cube
@@ -259,6 +266,7 @@ void Draw(sf::Window& window)
 	glUniformMatrix4fv(Uniform_proj, 1, GL_FALSE, glm::value_ptr(proj));
 	glEnableVertexAttribArray(Attrib_vertex); // Включаем атрибут
 	glEnableVertexAttribArray(Attrib_color);
+	glEnableVertexAttribArray(Attrib_tex_coord);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO); // Привязываем буфер
 	glVertexAttribPointer(Attrib_vertex, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (GLvoid*)0); 	// Указываем данные атрибута
 	glVertexAttribPointer(Attrib_color, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));

@@ -19,3 +19,33 @@ void main() {
     gl_FragColor = vcolor;
 }
 )";
+
+const char* TexVShader = R"(
+in vec3 position;
+in vec3 color;
+in vec2 texCoord;
+out vec3 ourColor;
+out vec2 TexCoord;
+void main() {
+    gl_Position = vec4(position, 1.0f);
+    ourColor = color;
+    TexCoord = texCoord
+})";
+
+const char* TexColorFshader = R"(
+in vec3 ourColor;
+in vec2 TexCoord;
+out vec4 color;
+uniform sampler2D ourTexture;
+uniform float mixValue;
+void main() {
+     color = mix(texture(ourTexture, TexCoord), vec4(ourColor, 1.0f), mixValue);
+})";
+
+const char* TexTextureFshader = R"(
+uniform sampler2D ourTexture1;
+uniform sampler2D ourTexture2;
+uniform float mixValue;
+void main(){
+    color = mix(texture(ourTexture1, TexCoord), texture(ourTexture2, TexCoord), mixValue);
+})";
