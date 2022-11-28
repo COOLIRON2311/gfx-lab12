@@ -11,16 +11,38 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 // ID шейдерной программы
-GLuint Program;
+GLuint Task1;
+GLuint Task2;
+GLuint Task3;
+GLuint Task4;
+
+GLuint texture1;
+GLuint texture2;
+
 // ID атрибута
-GLint Attrib_vertex;
-GLint Attrib_color;
-GLint Attrib_tex_coord;
-GLint Uniform_proj;
-GLint Uniform_affine;
-GLint Uniform_texture1;
-GLint Uniform_texture2;
-GLint Uniform_mix_value;
+GLint A1_vertex;
+GLint A1_color;
+GLint U1_affine;
+GLint U1_proj;
+
+GLint A2_vertex;
+GLint A2_color;
+GLint A2_texCoord;
+GLint U2_affine;
+GLint U2_proj;
+
+GLint A3_vertex;
+GLint A3_color;
+GLint A3_texCoord;
+GLint U3_affine;
+GLint U3_proj;
+
+GLint A4_vertex;
+GLint A4_color;
+GLint U4_affine;
+GLint U4_proj;
+
+GLint U_mix_value;
 // ID вершинного буфера
 GLuint VBO;
 
@@ -54,13 +76,18 @@ struct Vertex
 void SetIcon(sf::Window& wnd);
 // Функция для проверки ошибок
 void checkOpenGLerror();
-//
+
+
+
 void ShaderLog(unsigned int shader);
 // Функция для загрузки шейдеров
 void InitShader();
+void LoadAttrib(GLuint prog, GLint& attrib, const char* attr_name);
+void LoadUniform(GLuint prog, GLint& attrib, const char* attr_name);
 // Функция для инициализации вершинного буфера
 void InitVBO();
 // Функция для инициализации ресурсов
+void InitTextures();
 void Init();
 // Функция для отрисовки
 void Draw(sf::Window& window);

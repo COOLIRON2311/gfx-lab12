@@ -1,5 +1,7 @@
 ﻿#include "main.h"
 #include "shaders.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 ShapeType shapetype = ShapeType::Gradient_Tetrahedron;
 
@@ -13,6 +15,7 @@ void Init()
 	InitShader();
 	// Инициализируем вершинный буфер
 	InitVBO();
+	InitTextures();
 }
 
 int main()
@@ -39,7 +42,7 @@ int main()
 				glViewport(0, 0, event.size.width, event.size.height); // Устанавливаем область вывода
 			}
 			else if (event.type == sf::Event::KeyPressed)
-			{	
+			{
 				// Rotation
 				if (event.key.code == sf::Keyboard::P)
 				{
@@ -81,23 +84,29 @@ int main()
 				}
 				else if (event.key.code == sf::Keyboard::Equal)
 				{
-					/*TODO*/
+					if (tex_ratio < 1.0f)
+					{
+						tex_ratio += 0.1f;
+					}
 				}
 				else if (event.key.code == sf::Keyboard::Subtract)
 				{
-					/*TODO*/
+					if (tex_ratio > 0.1f)
+					{
+						tex_ratio -= 0.1f;
+					}
 				}
 
 				else if (event.key.code == sf::Keyboard::F1)
 				{
 					proj = glm::perspective(45.0f, 1.0f, 0.1f, 100.0f);
 				}
-				
+
 				else if (event.key.code == sf::Keyboard::F2)
 				{
 					proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.1f, 100.0f);
 				}
-				
+
 				else if (event.key.code == sf::Keyboard::Escape)
 				{
 					affine = glm::mat4(1.0f);
@@ -107,7 +116,7 @@ int main()
 				{
 					shapetype = ShapeType::Gradient_Tetrahedron;
 				}
-				
+
 				else if (event.key.code == sf::Keyboard::Num2)
 				{
 					shapetype = ShapeType::Gradient_Texture_Cube;
@@ -137,148 +146,236 @@ void InitVBO()
 {
 	glGenBuffers(1, &VBO); // Генерируем вершинный буфер
 	Vertex data[] = {
-		/*
-		//Cube
-		{1.0f, 1.0f, 1.0f, red},	//0
-		{1.0f, 1.0f, -1.0f, blue},	//1
-		{1.0f, -1.0f, 1.0f, green},	//2
-		{1.0f, -1.0f, -1.0f, red},	//3
-		{-1.0f, 1.0f, 1.0f, blue},	//4
-		{-1.0f, 1.0f, -1.0f, green},//5
-		{-1.0f, -1.0f, 1.0f, red},	//6
-		{-1.0f, -1.0f, -1.0f, blue}	//7*/
-
-		/*
 		//Tetrahedron
-		{1.0f, 0.0f, 0.0f, red},	//p1
-		{0.0f, 1.0f, 0.0f, blue},	//p2
-		{1.0f, 1.0f, 1.0f, green},	//p3
-		{0.0f, 0.0f, 1.0f, orange},	//p4
-		*/
-
-		//Tetrahedron
-		{0.0f, 0.0f, 0.0f, red},{0.0f, 1.0f, 1.0f, green},{1.0f, 0.0f, 1.0f, blue},
-		{0.0f, 0.0f, 0.0f, red},{0.0f, 1.0f, 1.0f, green},{1.0f, 1.0f, 0.0f, white},
-		{0.0f, 0.0f, 0.0f, red},{1.0f, 1.0f, 0.0f, white},{1.0f, 0.0f, 1.0f, blue},
-		{1.0f, 1.0f, 0.0f, white},{1.0f, 0.0f, 1.0f, blue},{0.0f, 1.0f ,1.0f, green},
+		{0.0f, 0.0f, 0.0f, red}, {0.0f, 1.0f, 1.0f, green}, {1.0f, 0.0f, 1.0f, blue},
+		{0.0f, 0.0f, 0.0f, red}, {0.0f, 1.0f, 1.0f, green}, {1.0f, 1.0f, 0.0f, white},
+		{0.0f, 0.0f, 0.0f, red}, {1.0f, 1.0f, 0.0f, white}, {1.0f, 0.0f, 1.0f, blue},
+		{1.0f, 1.0f, 0.0f, white}, {1.0f, 0.0f, 1.0f, blue}, {0.0f, 1.0f, 1.0f, green},
 
 		//Cube
-		{1.0f, 1.0f, -1.0f, red},{-1.0f, 1.0f, -1.0f,blue},{-1.0f, 1.0f, 1.0f, green},{1.0f, 1.0f, 1.0f, orange}, //top face
-		{1.0f, -1.0f, 1.0f, yellow},{-1.0f, -1.0f, 1.0f, violet}, {-1.0f, -1.0f, -1.0f, white},{1.0f, -1.0f, -1.0f, cyan}, // bottom face
-		{1.0f, 1.0f, 1.0f, orange},{-1.0f, 1.0f, 1.0f, green},{-1.0f, -1.0f, 1.0f, violet},{1.0f, -1.0f, 1.0f, yellow}, // front face
-		{1.0f, -1.0f, -1.0f, cyan},{-1.0f, -1.0f, -1.0f, white},{-1.0f, 1.0f, -1.0f, blue},{1.0f, 1.0f, -1.0f, red}, //back face
-		{-1.0f, 1.0f, 1.0f, green},{-1.0f, 1.0f, -1.0f, blue},{-1.0f, -1.0f, -1.0f, white},{-1.0f, -1.0f, 1.0f, violet}, //left face
-		{1.0f, 1.0f, -1.0f, red},{1.0f, 1.0f, 1.0f, orange},{1.0f, -1.0f, 1.0f, yellow},{1.0f, -1.0f, -1.0f, cyan}, //right face
+		{1.0f, 1.0f, -1.0f, red}, {-1.0f, 1.0f, -1.0f,blue}, {-1.0f, 1.0f, 1.0f, green},{1.0f, 1.0f, 1.0f, orange}, //top face
+		{1.0f, -1.0f, 1.0f, yellow}, {-1.0f, -1.0f, 1.0f, violet}, {-1.0f, -1.0f, -1.0f, white}, {1.0f, -1.0f, -1.0f, cyan}, // bottom face
+		{1.0f, 1.0f, 1.0f, orange}, {-1.0f, 1.0f, 1.0f, green}, {-1.0f, -1.0f, 1.0f, violet}, {1.0f, -1.0f, 1.0f, yellow}, // front face
+		{1.0f, -1.0f, -1.0f, cyan}, {-1.0f, -1.0f, -1.0f, white}, {-1.0f, 1.0f, -1.0f, blue}, {1.0f, 1.0f, -1.0f, red}, //back face
+		{-1.0f, 1.0f, 1.0f, green}, {-1.0f, 1.0f, -1.0f, blue}, {-1.0f, -1.0f, -1.0f, white}, {-1.0f, -1.0f, 1.0f, violet}, //left face
+		{1.0f, 1.0f, -1.0f, red}, {1.0f, 1.0f, 1.0f, orange}, {1.0f, -1.0f, 1.0f, yellow}, {1.0f, -1.0f, -1.0f, cyan}, //right face
 
 	};
+
+	/*float texCoor[] = {
+    // positions          // colors           // texture coords
+     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+	};*/
+
 	glBindBuffer(GL_ARRAY_BUFFER, VBO); // Привязываем вершинный буфер
 	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW); // Загружаем данные в буфер
 	checkOpenGLerror();
 }
 
-void InitShader()
+void InitTextures()
 {
-	// Создаем вершинный шейдер
-	GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
-	// Загружаем исходный код шейдера
-	glShaderSource(vShader, 1, &VertexShaderSource, NULL);
-	// Компилируем шейдер
-	glCompileShader(vShader);
-	// Проверяем на ошибки
-	std::cout << "vertex shader \n";
-	ShaderLog(vShader);
-	// Создаем фрагментный шейдер
-	GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
-	// Загружаем исходный код шейдера
-	glShaderSource(fShader, 1, &FragShaderSource, NULL);
-	// Компилируем шейдер
-	glCompileShader(fShader);
-	// Проверяем на ошибки
-	std::cout << "fragment shader \n";
-	ShaderLog(fShader);
-
-	// Создаем шейдерную программу
-	Program = glCreateProgram();
-	// Прикрепляем шейдеры к программе
-	glAttachShader(Program, vShader);
-	glAttachShader(Program, fShader);
-	// Линкуем шейдерную программу
-	glLinkProgram(Program);
-
-	int link_ok;
-	glGetProgramiv(Program, GL_LINK_STATUS, &link_ok);
-	// Проверяем на ошибки
-	if (!link_ok)
+	glGenTextures(1, &texture1); // Генерируем текстуру
+	glBindTexture(GL_TEXTURE_2D, texture1); // Привязываем текстуру
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // Устанавливаем параметры текстуры
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	int width, height, channels; // Загружаем текстуру
+	unsigned char* data = stbi_load("roof.jpg", &width, &height, &channels, 0);
+	if (data)
 	{
-		std::cout << "error attach shaders \n";
-		return;
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
 	}
-	// Вытягиваем ID атрибута из шейдерной программы
-	const char* attr_name = "coord";
-	Attrib_vertex = glGetAttribLocation(Program, attr_name);
-	if (Attrib_vertex == -1)
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+	}
+	stbi_image_free(data); // Освобождаем память
+
+	glGenTextures(1, &texture2); // Генерируем текстуру
+	glBindTexture(GL_TEXTURE_2D, texture2); // Привязываем текстуру
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // Устанавливаем параметры текстуры
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	data = stbi_load("wall.jpg", &width, &height, &channels, 0);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+	}
+	stbi_image_free(data); // Освобождаем память
+}
+
+void LoadAttrib(GLuint prog, GLint& attrib, const char* attr_name)
+{
+	attrib = glGetAttribLocation(prog, attr_name);
+	if (attrib == -1)
 	{
 		std::cout << "could not bind attrib " << attr_name << std::endl;
 		return;
 	}
+}
 
-	const char* attr_name2 = "color";
-	Attrib_color = glGetAttribLocation(Program, attr_name2);
-	if (Attrib_color == -1)
+void LoadUniform(GLuint prog, GLint& attrib, const char* attr_name)
+{
+	attrib = glGetUniformLocation(prog, attr_name);
+	if (attrib == -1)
 	{
-		std::cout << "could not bind attrib " << attr_name2 << std::endl;
+		std::cout << "could not bind uniform " << attr_name << std::endl;
+		return;
+	}
+}
+
+void InitShader()
+{
+	GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vShader, 1, &VertexShaderSource, NULL);
+	glCompileShader(vShader);
+	std::cout << "vertex shader \n";
+	ShaderLog(vShader);
+
+	GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fShader, 1, &FragShaderSource, NULL);
+	glCompileShader(fShader);
+	std::cout << "fragment shader \n";
+	ShaderLog(fShader);
+
+	GLuint texVshader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(texVshader, 1, &TexVShader, NULL);
+	glCompileShader(texVshader);
+	std::cout << "texture vertex shader \n";
+	ShaderLog(texVshader);
+
+	GLuint texColFshader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(texColFshader, 1, &TexColorFshader, NULL);
+	glCompileShader(texColFshader);
+	std::cout << "texture color fragment shader \n";
+	ShaderLog(texColFshader);
+
+	GLuint texTexshader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(texTexshader, 1, &TexTextureFshader, NULL);
+	glCompileShader(texTexshader);
+	std::cout << "texture texture fragment shader \n";
+	ShaderLog(texTexshader);
+
+	// Создаем шейдерную программу
+	Task1 = glCreateProgram();
+	Task2 = glCreateProgram();
+	Task3 = glCreateProgram();
+	Task4 = glCreateProgram();
+
+	// Прикрепляем шейдеры к программе
+	glAttachShader(Task1, vShader);
+	glAttachShader(Task1, fShader);
+
+	glAttachShader(Task2, texVshader);
+	glAttachShader(Task2, texColFshader);
+
+	glAttachShader(Task3, texVshader);
+	glAttachShader(Task3, texTexshader);
+
+	glAttachShader(Task4, vShader);
+	glAttachShader(Task4, fShader);
+
+	// Линкуем шейдерную программу
+	glLinkProgram(Task1);
+	glLinkProgram(Task2);
+	glLinkProgram(Task3);
+	glLinkProgram(Task4);
+
+	int link1, link2, link3, link4;
+	glGetProgramiv(Task1, GL_LINK_STATUS, &link1);
+	glGetProgramiv(Task2, GL_LINK_STATUS, &link2);
+	glGetProgramiv(Task3, GL_LINK_STATUS, &link3);
+	glGetProgramiv(Task4, GL_LINK_STATUS, &link4);
+
+	// Проверяем на ошибки
+	if (!link1 || !link2 || !link3 || !link4)
+	{
+		std::cout << "error attach shaders \n";
 		return;
 	}
 
-	const char* attr_name3 = "affine";
-	Uniform_affine = glGetUniformLocation(Program, attr_name3);
-	if (Uniform_affine == -1)
-	{
-		std::cout << "could not bind uniform " << attr_name3 << std::endl;
-		return;
-	}
+	LoadAttrib(Task1, A1_vertex, "coord");
+	LoadAttrib(Task1, A1_color, "color");
+	LoadUniform(Task1, U1_affine, "affine");
+	LoadUniform(Task1, U1_proj, "proj");
 
-	const char* attr_name4 = "proj";
-	Uniform_proj = glGetUniformLocation(Program, attr_name4);
-	if (Uniform_proj == -1)
-	{
-		std::cout << "could not bind uniform " << attr_name4 << std::endl;
-		return;
-	}
-	
+	LoadAttrib(Task2, A2_vertex, "position");
+	LoadAttrib(Task2, A2_color, "color");
+	LoadAttrib(Task2, A2_texCoord, "texCoord");
+	LoadUniform(Task2, U2_affine, "affine");
+	LoadUniform(Task2, U2_proj, "proj");
+
+	LoadAttrib(Task3, A3_vertex, "position");
+	//LoadAttrib(Task3, A3_color, "color");
+	LoadAttrib(Task3, A3_texCoord, "texCoord");
+	LoadUniform(Task3, U3_affine, "affine");
+	LoadUniform(Task3, U3_proj, "proj");
+
+	LoadAttrib(Task4, A4_vertex, "coord");
+	LoadAttrib(Task4, A4_color, "color");
+	LoadUniform(Task4, U4_affine, "affine");
+	LoadUniform(Task4, U4_proj, "proj");
+
 	checkOpenGLerror();
 }
 
 void Draw(sf::Window& window)
 {
-	glUseProgram(Program); // Устанавливаем шейдерную программу
-	glUniformMatrix4fv(Uniform_affine, 1, GL_FALSE, glm::value_ptr(affine));
-	glUniformMatrix4fv(Uniform_proj, 1, GL_FALSE, glm::value_ptr(proj));
-	glEnableVertexAttribArray(Attrib_vertex); // Включаем атрибут
-	glEnableVertexAttribArray(Attrib_color);
-	glEnableVertexAttribArray(Attrib_tex_coord);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO); // Привязываем буфер
-	glVertexAttribPointer(Attrib_vertex, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)0); 	// Указываем данные атрибута
-	glVertexAttribPointer(Attrib_color, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-	glBindBuffer(GL_ARRAY_BUFFER, 0); // Отвязываем буфер
-	
 	switch (shapetype)
 	{
-	case ShapeType::Gradient_Tetrahedron:
-		window.setTitle("Gradient Tetrahedron");
-		glDrawArrays(GL_TRIANGLES, 0, 12);
-		break;
-	case ShapeType::Gradient_Texture_Cube:
-		window.setTitle("Gradient & Texture Cube");
-		glDrawArrays(GL_QUADS, 12, 24);
-		break;
-	default:
-		break;
+		case ShapeType::Gradient_Tetrahedron:
+			window.setTitle("Gradient Tetrahedron");
+			glUseProgram(Task1);
+			glUniformMatrix4fv(U1_affine, 1, GL_FALSE, glm::value_ptr(affine));
+			glUniformMatrix4fv(U1_proj, 1, GL_FALSE, glm::value_ptr(proj));
+			glEnableVertexAttribArray(A1_vertex);
+			glEnableVertexAttribArray(A1_color);
+			glBindBuffer(GL_ARRAY_BUFFER, VBO);
+			glVertexAttribPointer(A1_vertex, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)0);
+			glVertexAttribPointer(A1_color, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glDrawArrays(GL_TRIANGLES, 0, 12);
+			break;
+		case ShapeType::Gradient_Texture_Cube:
+			/*
+			  LoadAttrib(Task2, A2_vertex, "position");
+			  LoadAttrib(Task2, A2_color, "color");
+			  LoadAttrib(Task2, A2_texCoord, "texCoord");
+			  LoadUniform(Task2, U2_affine, "affine");
+			  LoadUniform(Task2, U2_proj, "proj");
+			*/
+			window.setTitle("Gradient & Texture Cube");
+			glUseProgram(Task2);
+			glUniformMatrix4fv(U2_affine, 1, GL_FALSE, glm::value_ptr(affine));
+			glUniformMatrix4fv(U2_proj, 1, GL_FALSE, glm::value_ptr(proj));
+			glEnableVertexAttribArray(A2_vertex);
+			glEnableVertexAttribArray(A2_color);
+			glEnableVertexAttribArray(A2_texCoord);
+			glBindBuffer(GL_ARRAY_BUFFER, VBO);
+			glVertexAttribPointer(A2_vertex, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)0);
+			glVertexAttribPointer(A2_color, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+			glVertexAttribPointer(A2_texCoord, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)(7 * sizeof(GLfloat)));
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glDrawArrays(GL_QUADS, 12, 24);
+			break;
+		default:
+			break;
 	}
-	
 
-	glDisableVertexAttribArray(Attrib_vertex); // Отключаем атрибут
-	glDisableVertexAttribArray(Attrib_color);
+
+	glDisableVertexAttribArray(A1_vertex); // Отключаем атрибут
+	glDisableVertexAttribArray(A1_color);
 	glUseProgram(0); // Отключаем шейдерную программу
 	checkOpenGLerror(); // Проверяем на ошибки
 }
@@ -298,7 +395,7 @@ void ReleaseVBO()
 void ReleaseShader()
 {
 	glUseProgram(0); // Отключаем шейдерную программу
-	glDeleteProgram(Program); // Удаляем шейдерную программу
+	glDeleteProgram(Task1); // Удаляем шейдерную программу
 }
 
 void ShaderLog(unsigned int shader)
