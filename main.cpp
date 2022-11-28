@@ -157,13 +157,12 @@ void InitVBO()
 		{0.0f, 0.0f, 1.0f, orange},	//p4
 		*/
 
-		
 		//Tetrahedron
-		{1.0f, 0.0f, 0.0f, red},{0.0f, 1.0f, 0.0f, red},{1.0f, 1.0f, 1.0f, red}, // 1 face
-		{1.0f, 0.0f, 0.0f, green},{0.0f, 1.0f, 0.0f, green},{0.0f, 0.0f, 1.0f, green}, // 2 face
-		{1.0f, 0.0f, 0.0f, blue},{1.0f, 1.0f, 1.0f, blue},{0.0f, 0.0f, 1.0f, blue}, // 3 face
-		{0.0f, 1.0f, 0.0f, orange},{1.0f, 1.0f, 1.0f, orange},{0.0f, 0.0f, 1.0f, orange}, // 4 face
-		
+		{0.0f, 0.0f, 0.0f, red},{0.0f, 1.0f, 1.0f, green},{1.0f, 0.0f, 1.0f, blue},
+		{0.0f, 0.0f, 0.0f, red},{0.0f, 1.0f, 1.0f, green},{1.0f, 1.0f, 0.0f, white},
+		{0.0f, 0.0f, 0.0f, red},{1.0f, 1.0f, 0.0f, white},{1.0f, 0.0f, 1.0f, blue},
+		{1.0f, 1.0f, 0.0f, white},{1.0f, 0.0f, 1.0f, blue},{0.0f, 1.0f ,1.0f, green},
+
 
 		//Cube
 		{1.0f, 1.0f, -1.0f, red},{-1.0f, 1.0f, -1.0f,blue},{-1.0f, 1.0f, 1.0f, green},{1.0f, 1.0f, 1.0f, orange}, //top face
