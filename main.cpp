@@ -82,18 +82,18 @@ int main()
 				{
 					affine = glm::translate(affine, glm::vec3(0.0f, -0.1f, 0.0f));
 				}
-				else if (event.key.code == sf::Keyboard::Equal)
+				else if (event.key.code == sf::Keyboard::Add)
 				{
-					if (tex_ratio < 1.0f)
+					if (mix_value < 1.0f)
 					{
-						tex_ratio += 0.1f;
+						mix_value += 0.1f;
 					}
 				}
 				else if (event.key.code == sf::Keyboard::Subtract)
 				{
-					if (tex_ratio > 0.1f)
+					if (mix_value > 0.1f)
 					{
-						tex_ratio -= 0.1f;
+						mix_value -= 0.1f;
 					}
 				}
 
@@ -153,12 +153,12 @@ void InitVBO()
 		{1.0f, 1.0f, 0.0f, white}, {1.0f, 0.0f, 1.0f, blue}, {0.0f, 1.0f, 1.0f, green},
 
 		//Cube
-		{1.0f, 1.0f, -1.0f, red}, {-1.0f, 1.0f, -1.0f,blue}, {-1.0f, 1.0f, 1.0f, green},{1.0f, 1.0f, 1.0f, orange}, //top face
-		{1.0f, -1.0f, 1.0f, yellow}, {-1.0f, -1.0f, 1.0f, violet}, {-1.0f, -1.0f, -1.0f, white}, {1.0f, -1.0f, -1.0f, cyan}, // bottom face
-		{1.0f, 1.0f, 1.0f, orange}, {-1.0f, 1.0f, 1.0f, green}, {-1.0f, -1.0f, 1.0f, violet}, {1.0f, -1.0f, 1.0f, yellow}, // front face
-		{1.0f, -1.0f, -1.0f, cyan}, {-1.0f, -1.0f, -1.0f, white}, {-1.0f, 1.0f, -1.0f, blue}, {1.0f, 1.0f, -1.0f, red}, //back face
-		{-1.0f, 1.0f, 1.0f, green}, {-1.0f, 1.0f, -1.0f, blue}, {-1.0f, -1.0f, -1.0f, white}, {-1.0f, -1.0f, 1.0f, violet}, //left face
-		{1.0f, 1.0f, -1.0f, red}, {1.0f, 1.0f, 1.0f, orange}, {1.0f, -1.0f, 1.0f, yellow}, {1.0f, -1.0f, -1.0f, cyan}, //right face
+		{1.0f, 1.0f, -1.0f, red, 1.0f, 0.0f}, {-1.0f, 1.0f, -1.0f, blue, 0.0f, 0.0f}, {-1.0f, 1.0f, 1.0f, green, 0.0f, 1.0f},{1.0f, 1.0f, 1.0f, orange, 1.0f, 1.0f}, //top face
+		{1.0f, -1.0f, 1.0f, yellow, 1.0f, 0.0f}, {-1.0f, -1.0f, 1.0f, violet, 0.0f, 0.0f}, {-1.0f, -1.0f, -1.0f, white, 0.0f, 1.0f}, {1.0f, -1.0f, -1.0f, cyan, 1.0f,1.0f}, // bottom face
+		{1.0f, 1.0f, 1.0f, orange, 1.0f, 0.0f}, {-1.0f, 1.0f, 1.0f, green, 0.0f, 0.0f}, {-1.0f, -1.0f, 1.0f, violet, 0.0f, 1.0f}, {1.0f, -1.0f, 1.0f, yellow, 1.0f, 1.0f}, // front face
+		{1.0f, -1.0f, -1.0f, cyan, 0.0f, 1.0f}, {-1.0f, -1.0f, -1.0f, white, 1.0f, 1.0f}, {-1.0f, 1.0f, -1.0f, blue, 1.0f, 0.0f}, {1.0f, 1.0f, -1.0f, red, 0.0f, 0.0f}, //back face
+		{-1.0f, 1.0f, 1.0f, green, 1.0f, 0.0f}, {-1.0f, 1.0f, -1.0f, blue, 0.0f, 0.0f}, {-1.0f, -1.0f, -1.0f, white, 0.0f, 1.0f}, {-1.0f, -1.0f, 1.0f, violet, 1.0f, 1.0f}, //left face
+		{1.0f, 1.0f, -1.0f, red, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f, orange, 0.0f, 0.0f}, {1.0f, -1.0f, 1.0f, yellow, 0.0f, 1.0f}, {1.0f, -1.0f, -1.0f, cyan, 1.0f, 1.0f}, //right face
 
 	};
 
@@ -178,13 +178,14 @@ void InitVBO()
 void InitTextures()
 {
 	glGenTextures(1, &texture1); // Генерируем текстуру
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture1); // Привязываем текстуру
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // Устанавливаем параметры текстуры
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	int width, height, channels; // Загружаем текстуру
-	unsigned char* data = stbi_load("roof.jpg", &width, &height, &channels, 0);
+	unsigned char* data = stbi_load("metallica.jpg", &width, &height, &channels, 0);
 	if (data)
 	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -197,6 +198,7 @@ void InitTextures()
 	stbi_image_free(data); // Освобождаем память
 
 	glGenTextures(1, &texture2); // Генерируем текстуру
+	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, texture2); // Привязываем текстуру
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // Устанавливаем параметры текстуры
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -315,12 +317,14 @@ void InitShader()
 	LoadAttrib(Task2, A2_texCoord, "texCoord");
 	LoadUniform(Task2, U2_affine, "affine");
 	LoadUniform(Task2, U2_proj, "proj");
+	LoadUniform(Task2, U2_mix_value, "mixValue");
 
 	LoadAttrib(Task3, A3_vertex, "position");
 	//LoadAttrib(Task3, A3_color, "color");
 	LoadAttrib(Task3, A3_texCoord, "texCoord");
 	LoadUniform(Task3, U3_affine, "affine");
 	LoadUniform(Task3, U3_proj, "proj");
+	LoadUniform(Task3, U3_mix_value, "mixValue");
 
 	LoadAttrib(Task4, A4_vertex, "coord");
 	LoadAttrib(Task4, A4_color, "color");
@@ -348,17 +352,12 @@ void Draw(sf::Window& window)
 			glDrawArrays(GL_TRIANGLES, 0, 12);
 			break;
 		case ShapeType::Gradient_Texture_Cube:
-			/*
-			  LoadAttrib(Task2, A2_vertex, "position");
-			  LoadAttrib(Task2, A2_color, "color");
-			  LoadAttrib(Task2, A2_texCoord, "texCoord");
-			  LoadUniform(Task2, U2_affine, "affine");
-			  LoadUniform(Task2, U2_proj, "proj");
-			*/
 			window.setTitle("Gradient & Texture Cube");
 			glUseProgram(Task2);
 			glUniformMatrix4fv(U2_affine, 1, GL_FALSE, glm::value_ptr(affine));
 			glUniformMatrix4fv(U2_proj, 1, GL_FALSE, glm::value_ptr(proj));
+			glUniform1f(U2_mix_value, mix_value);
+			glUniform1i(glGetUniformLocation(Task2, "ourTexture"), 0);
 			glEnableVertexAttribArray(A2_vertex);
 			glEnableVertexAttribArray(A2_color);
 			glEnableVertexAttribArray(A2_texCoord);
@@ -366,6 +365,25 @@ void Draw(sf::Window& window)
 			glVertexAttribPointer(A2_vertex, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)0);
 			glVertexAttribPointer(A2_color, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 			glVertexAttribPointer(A2_texCoord, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)(7 * sizeof(GLfloat)));
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glDrawArrays(GL_QUADS, 12, 24);
+			break;
+		
+		case ShapeType::Double_Texture_Cube:
+			window.setTitle("Double Texture Cube");
+			glUseProgram(Task3);
+			glUniformMatrix4fv(U3_affine, 1, GL_FALSE, glm::value_ptr(affine));
+			glUniformMatrix4fv(U3_proj, 1, GL_FALSE, glm::value_ptr(proj));
+			glUniform1f(U3_mix_value, mix_value);
+			glUniform1i(glGetUniformLocation(Task3, "ourTexture1"), 0);
+			glUniform1i(glGetUniformLocation(Task3, "ourTexture2"), 1);
+			glEnableVertexAttribArray(A3_vertex);
+			//glEnableVertexAttribArray(A3_color);
+			glEnableVertexAttribArray(A3_texCoord);
+			glBindBuffer(GL_ARRAY_BUFFER, VBO);
+			glVertexAttribPointer(A3_vertex, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)0);
+			//glVertexAttribPointer(A3_color, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+			glVertexAttribPointer(A3_texCoord, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)(7 * sizeof(GLfloat)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glDrawArrays(GL_QUADS, 12, 24);
 			break;

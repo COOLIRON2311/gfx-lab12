@@ -18,6 +18,8 @@ GLuint Task4;
 
 GLuint texture1;
 GLuint texture2;
+GLint U2_mix_value;
+GLint U3_mix_value;
 
 // ID атрибута
 GLint A1_vertex;
@@ -42,7 +44,6 @@ GLint A4_color;
 GLint U4_affine;
 GLint U4_proj;
 
-GLint U_mix_value;
 // ID вершинного буфера
 GLuint VBO;
 
@@ -51,7 +52,7 @@ glm::mat4 affine;
 // Матрица проекции
 glm::mat4 proj;
 
-GLfloat tex_ratio = 0.5f;
+GLfloat mix_value = 0.5f;
 
 // Структура для хранения вершин
 struct Vertex
