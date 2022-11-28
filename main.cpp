@@ -136,14 +136,6 @@ EXIT_IS_RIGHT_HERE: // Метка выхода
 void InitVBO()
 {
 	glGenBuffers(1, &VBO); // Генерируем вершинный буфер
-	Vertex cp1 = { 1.0f, 1.0f, 1.0f, red };
-	Vertex cp2 = { 1.0f, 1.0f, -1.0f, green };
-	Vertex cp3 = { 1.0f, -1.0f, 1.0f, blue };
-	Vertex cp4 = { 1.0f, -1.0f, -1.0f, cyan };
-	Vertex cp5 = { -1.0f, 1.0f, 1.0f, yellow };
-	Vertex cp6 = {-1.0f, 1.0f, -1.0f, orange};
-	Vertex cp7 = {-1.0f, -1.0f, 1.0f, white};
-	Vertex cp8 = {-1.0f, -1.0f, -1.0f, violet};
 	Vertex data[] = {
 		/*
 		//Cube
@@ -164,13 +156,11 @@ void InitVBO()
 		{0.0f, 0.0f, 1.0f, orange},	//p4
 		*/
 
-		
 		//Tetrahedron
-		{1.0f, 0.0f, 0.0f, red},{0.0f, 1.0f, 0.0f, red},{1.0f, 1.0f, 1.0f, red}, // 1 face
-		{1.0f, 0.0f, 0.0f, green},{0.0f, 1.0f, 0.0f, green},{0.0f, 0.0f, 1.0f, green}, // 2 face
-		{1.0f, 0.0f, 0.0f, blue},{1.0f, 1.0f, 1.0f, blue},{0.0f, 0.0f, 1.0f, blue}, // 3 face
-		{0.0f, 1.0f, 0.0f, orange},{1.0f, 1.0f, 1.0f, orange},{0.0f, 0.0f, 1.0f, orange}, // 4 face
-		
+		{0.0f, 0.0f, 0.0f, red},{0.0f, 1.0f, 1.0f, green},{1.0f, 0.0f, 1.0f, blue},
+		{0.0f, 0.0f, 0.0f, red},{0.0f, 1.0f, 1.0f, green},{1.0f, 1.0f, 0.0f, white},
+		{0.0f, 0.0f, 0.0f, red},{1.0f, 1.0f, 0.0f, white},{1.0f, 0.0f, 1.0f, blue},
+		{1.0f, 1.0f, 0.0f, white},{1.0f, 0.0f, 1.0f, blue},{0.0f, 1.0f ,1.0f, green},
 
 		//Cube
 		{1.0f, 1.0f, -1.0f, red},{-1.0f, 1.0f, -1.0f,blue},{-1.0f, 1.0f, 1.0f, green},{1.0f, 1.0f, 1.0f, orange}, //top face
@@ -268,8 +258,8 @@ void Draw(sf::Window& window)
 	glEnableVertexAttribArray(Attrib_color);
 	glEnableVertexAttribArray(Attrib_tex_coord);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO); // Привязываем буфер
-	glVertexAttribPointer(Attrib_vertex, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (GLvoid*)0); 	// Указываем данные атрибута
-	glVertexAttribPointer(Attrib_color, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glVertexAttribPointer(Attrib_vertex, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)0); 	// Указываем данные атрибута
+	glVertexAttribPointer(Attrib_color, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 	glBindBuffer(GL_ARRAY_BUFFER, 0); // Отвязываем буфер
 	
 	switch (shapetype)
