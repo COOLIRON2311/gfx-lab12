@@ -120,3 +120,46 @@ enum class ShapeType {
 #define violet 0.5, 0.0, 1.0, 1.0
 #define white  1.0, 1.0, 1.0, 1.0
 #define cyan   0.0, 1.0, 1.0, 1.0
+
+class RGB {
+	static constexpr float DPI = M_PI * 2;
+	static constexpr float a60 = M_PI / 3;
+	static constexpr float a120 = a60 * 2;
+	static constexpr float a180 = M_PI;
+	static constexpr float a240 = M_PI + a60;
+	static constexpr float a300 = M_PI + a120;
+	static constexpr float a360 = DPI;
+
+public:
+	static float r(float phi) {
+		if (phi <= a60 || phi >= a300)
+			return 1.f;
+		
+		if (phi >= a120 && phi <= a240)
+			return 0.f;
+		
+		if (phi < a120)
+			return 1.f - (phi - a60) / a60;
+		
+		if (phi > a240)
+			return (phi - a240) / a60;
+	}
+
+	static float g(float phi) {
+		if (phi >= a60 && phi <= a180)
+			return 1.f;
+		
+		if (phi >= a240)
+			return 0.f;
+		
+		if (phi < a60)
+			return phi / a60;
+		
+		if (phi > a180)
+			return 1.f - (phi - a180) / a60;
+	}
+
+	static float b(float phi) {
+		return g(DPI - phi);
+	}
+};

@@ -186,20 +186,14 @@ void InitVBO()
 	};
 	
 	vector<Vertex> data2;
-	//data2.push_back({ 0.0f, 0.0f, 0.0f, white, 0.0f, 0.0f });
-	for (int i = 0; i < 360; i++)
+	data2.push_back({ 0.0f, 0.0f, 0.0f, white, 0.0f, 0.0f });
+	double step = 2*M_PI / 360;
+	double j = 0.0f;
+	for (int i = 1; i <= 361; i++, j += step)
 	{
-		Vertex v = { cos(i * 3.14 / 180.0f), sin(i * 3.14 / 180.0f), 0.0f, i%2 ? red : white, 0.0f, 0.0f};
+		Vertex v = { cos(j), sin(j), 0.0f, RGB::r(j), RGB::g(j), RGB::b(j), 1.0f, 0.0f, 0.0f};
 		data2.push_back(v);
 	}
-
-	/*float texCoor[] = {
-    // positions          // colors           // texture coords
-     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
-	};*/
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO); // Привязываем вершинный буфер
 	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW); // Загружаем данные в буфер
@@ -458,7 +452,7 @@ void Draw(sf::Window& window)
 			glVertexAttribPointer(A4_vertex, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)0);
 			glVertexAttribPointer(A4_color, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			glDrawArrays(GL_TRIANGLE_FAN, 0, 360);
+			glDrawArrays(GL_TRIANGLE_FAN, 0, 362);
 			glDisableVertexAttribArray(A4_vertex);
 			glDisableVertexAttribArray(A4_color);
 			glUseProgram(0);
