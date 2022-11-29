@@ -5,6 +5,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 #include <iostream>
+#include <vector>
 #include <corecrt_math_defines.h>
 
 #include <glm/glm.hpp>
@@ -43,14 +44,19 @@ GLint A4_vertex;
 GLint A4_color;
 GLint U4_affine;
 GLint U4_proj;
+GLint U4_scale;
 
 // ID вершинного буфера
 GLuint VBO;
+GLuint VBO2;
 
 // Матрицы аффиных преобразований
 glm::mat4 affine;
 // Матрица проекции
 glm::mat4 proj;
+
+// Матрица масштабирования
+glm::mat4 pie_scale;
 
 GLfloat mix_value = 0.5f;
 

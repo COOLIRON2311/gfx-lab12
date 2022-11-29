@@ -3,12 +3,15 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+using namespace std;
+
 ShapeType shapetype = ShapeType::Gradient_Tetrahedron;
 
 void Init()
 {
 	proj = glm::perspective(45.0f, 1.0f, 0.1f, 100.0f);
 	affine = glm::mat4(1.0f);
+	pie_scale = glm::mat4(1.0f);
 	//Включаем проверку глубины
 	glEnable(GL_DEPTH_TEST);
 	// Инициализируем шейдеры
@@ -110,6 +113,7 @@ int main()
 				else if (event.key.code == sf::Keyboard::Escape)
 				{
 					affine = glm::mat4(1.0f);
+					pie_scale = glm::mat4(1.0f);
 				}
 
 				else if (event.key.code == sf::Keyboard::Num1)
@@ -131,6 +135,24 @@ int main()
 				{
 					shapetype = ShapeType::Gradient_Pie;
 				}
+
+				// Pie Scaling
+				else if (event.key.code == sf::Keyboard::Numpad8)
+				{
+					pie_scale = glm::scale(pie_scale, glm::vec3(1.0f, 1.1f, 1.0f));
+				}
+				else if (event.key.code == sf::Keyboard::Numpad2)
+				{
+					pie_scale = glm::scale(pie_scale, glm::vec3(1.0f, 0.9f, 1.0f));
+				}
+				else if (event.key.code == sf::Keyboard::Numpad4)
+				{
+					pie_scale = glm::scale(pie_scale, glm::vec3(0.9f, 1.0f, 1.0f));
+				}
+				else if (event.key.code == sf::Keyboard::Numpad6)
+				{
+					pie_scale = glm::scale(pie_scale, glm::vec3(1.1f, 1.0f, 1.0f));
+				}
 			}
 		}
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Очищаем буфер цвета и буфер глубины
@@ -145,6 +167,7 @@ EXIT_IS_RIGHT_HERE: // Метка выхода
 void InitVBO()
 {
 	glGenBuffers(1, &VBO); // Генерируем вершинный буфер
+	glGenBuffers(1, &VBO2);
 	Vertex data[] = {
 		//Tetrahedron
 		{0.0f, 0.0f, 0.0f, red}, {0.0f, 1.0f, 1.0f, green}, {1.0f, 0.0f, 1.0f, blue},
@@ -161,6 +184,14 @@ void InitVBO()
 		{1.0f, 1.0f, -1.0f, red, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f, orange, 0.0f, 0.0f}, {1.0f, -1.0f, 1.0f, yellow, 0.0f, 1.0f}, {1.0f, -1.0f, -1.0f, cyan, 1.0f, 1.0f}, //right face
 
 	};
+	
+	vector<Vertex> data2;
+	//data2.push_back({ 0.0f, 0.0f, 0.0f, white, 0.0f, 0.0f });
+	for (int i = 0; i < 360; i++)
+	{
+		Vertex v = { cos(i * 3.14 / 180.0f), sin(i * 3.14 / 180.0f), 0.0f, white, 0.0f, 0.0f };
+		data2.push_back(v);
+	}
 
 	/*float texCoor[] = {
     // positions          // colors           // texture coords
@@ -172,6 +203,10 @@ void InitVBO()
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO); // Привязываем вершинный буфер
 	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW); // Загружаем данные в буфер
+	glBindBuffer(GL_ARRAY_BUFFER, 0); // Отвязываем вершинный буфер
+	glBindBuffer(GL_ARRAY_BUFFER, VBO2);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * data2.size(), data2.data(), GL_STATIC_DRAW); // Загружаем данные в буфер
+	glBindBuffer(GL_ARRAY_BUFFER, 0); // Отвязываем вершинный буфер
 	checkOpenGLerror();
 }
 
@@ -269,6 +304,18 @@ void InitShader()
 	std::cout << "texture texture fragment shader \n";
 	ShaderLog(texTexshader);
 
+	GLuint pieVShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(pieVShader, 1, &PieVShader, NULL);
+	glCompileShader(pieVShader);
+	std::cout << "pie vertex shader" << std::endl;
+	ShaderLog(pieVShader);
+
+	GLuint pieFShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(pieFShader, 1, &PieFShader, NULL);
+	glCompileShader(pieFShader);
+	std::cout << "pie fragment shader" << std::endl;
+	ShaderLog(pieFShader);
+
 	// Создаем шейдерную программу
 	Task1 = glCreateProgram();
 	Task2 = glCreateProgram();
@@ -285,8 +332,8 @@ void InitShader()
 	glAttachShader(Task3, texVshader);
 	glAttachShader(Task3, texTexshader);
 
-	glAttachShader(Task4, vShader);
-	glAttachShader(Task4, fShader);
+	glAttachShader(Task4, pieVShader);
+	glAttachShader(Task4, pieFShader);
 
 	// Линкуем шейдерную программу
 	glLinkProgram(Task1);
@@ -330,7 +377,7 @@ void InitShader()
 	LoadAttrib(Task4, A4_color, "color");
 	LoadUniform(Task4, U4_affine, "affine");
 	LoadUniform(Task4, U4_proj, "proj");
-
+	LoadUniform(Task4, U4_scale, "scale");
 	checkOpenGLerror();
 }
 
@@ -350,6 +397,9 @@ void Draw(sf::Window& window)
 			glVertexAttribPointer(A1_color, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glDrawArrays(GL_TRIANGLES, 0, 12);
+			glDisableVertexAttribArray(A1_vertex);
+			glDisableVertexAttribArray(A1_color);
+			glUseProgram(0);
 			break;
 		case ShapeType::Gradient_Texture_Cube:
 			window.setTitle("Gradient & Texture Cube");
@@ -367,6 +417,10 @@ void Draw(sf::Window& window)
 			glVertexAttribPointer(A2_texCoord, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)(7 * sizeof(GLfloat)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glDrawArrays(GL_QUADS, 12, 24);
+			glDisableVertexAttribArray(A2_vertex);
+			glDisableVertexAttribArray(A2_color);
+			glDisableVertexAttribArray(A2_texCoord);
+			glUseProgram(0);
 			break;
 		
 		case ShapeType::Double_Texture_Cube:
@@ -386,14 +440,32 @@ void Draw(sf::Window& window)
 			glVertexAttribPointer(A3_texCoord, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)(7 * sizeof(GLfloat)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glDrawArrays(GL_QUADS, 12, 24);
+			glDisableVertexAttribArray(A3_vertex);
+			//glDisableVertexAttribArray(A3_color);
+			glDisableVertexAttribArray(A3_texCoord);
+			glUseProgram(0);
+			break;
+		
+		case ShapeType::Gradient_Pie:
+			window.setTitle("Gradient Pie");
+			glUseProgram(Task4);
+			glUniformMatrix4fv(U4_affine, 1, GL_FALSE, glm::value_ptr(affine));
+			glUniformMatrix4fv(U4_proj, 1, GL_FALSE, glm::value_ptr(proj));
+			glUniformMatrix4fv(U4_scale, 1, GL_FALSE, glm::value_ptr(pie_scale));
+			glEnableVertexAttribArray(A4_vertex);
+			glEnableVertexAttribArray(A4_color);
+			glBindBuffer(GL_ARRAY_BUFFER, VBO2);
+			glVertexAttribPointer(A4_vertex, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)0);
+			glVertexAttribPointer(A4_color, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)(2 * sizeof(GLfloat)));
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glDrawArrays(GL_TRIANGLE_FAN, 0, 360);
+			glDisableVertexAttribArray(A4_vertex);
+			glDisableVertexAttribArray(A4_color);
+			glUseProgram(0);
 			break;
 		default:
 			break;
 	}
-
-
-	glDisableVertexAttribArray(A1_vertex); // Отключаем атрибут
-	glDisableVertexAttribArray(A1_color);
 	glUseProgram(0); // Отключаем шейдерную программу
 	checkOpenGLerror(); // Проверяем на ошибки
 }

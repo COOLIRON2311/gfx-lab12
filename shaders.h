@@ -53,3 +53,23 @@ uniform float mixValue;
 void main() {
     gl_FragColor = mix(texture(ourTexture1, TexCoord), texture(ourTexture2, TexCoord), mixValue);
 })";
+
+const char* PieVShader = R"(
+#version 330 core
+in vec3 coord;
+in vec4 color;
+out vec4 vcolor;
+uniform mat4 affine;
+uniform mat4 proj;
+uniform mat4 scale;
+void main() {
+    gl_Position = proj * affine * scale * vec4(coord / 2, 1.0);
+    vcolor = color;
+})";
+
+const char* PieFShader = R"(
+#version 330 core
+in vec4 vcolor;
+void main() {
+    gl_FragColor = vcolor;
+})";
