@@ -189,7 +189,7 @@ void InitVBO()
 	//data2.push_back({ 0.0f, 0.0f, 0.0f, white, 0.0f, 0.0f });
 	for (int i = 0; i < 360; i++)
 	{
-		Vertex v = { cos(i * 3.14 / 180.0f), sin(i * 3.14 / 180.0f), 0.0f, white, 0.0f, 0.0f };
+		Vertex v = { cos(i * 3.14 / 180.0f), sin(i * 3.14 / 180.0f), 0.0f, i%2 ? red : white, 0.0f, 0.0f};
 		data2.push_back(v);
 	}
 
@@ -456,7 +456,7 @@ void Draw(sf::Window& window)
 			glEnableVertexAttribArray(A4_color);
 			glBindBuffer(GL_ARRAY_BUFFER, VBO2);
 			glVertexAttribPointer(A4_vertex, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)0);
-			glVertexAttribPointer(A4_color, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)(2 * sizeof(GLfloat)));
+			glVertexAttribPointer(A4_color, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glDrawArrays(GL_TRIANGLE_FAN, 0, 360);
 			glDisableVertexAttribArray(A4_vertex);
